@@ -1,4 +1,6 @@
 const defaults = {
+	filenamePref: true, /* Use website title as filename */
+	noCookies: true, /* Save time where cookies not needed */
 	disablePref: false,
 	subtitlePref: false,
 	filePref: true,
@@ -18,7 +20,6 @@ const defaults = {
 	customCtEntries: [],
 	headersPref: true,
 	titlePref: true,
-	filenamePref: false,
 	timestampPref: false,
 	fileExtension: "ts",
 	streamlinkOutput: "file",
@@ -30,11 +31,12 @@ const defaults = {
 	customCommand: "",
 	blacklistPref: false,
 	blacklistEntries: [],
+	webTitlesBrandingRM: [],
 	noRestorePref: false,
 	recentPref: false,
 	recentAmount: "5",
 	notifDetectPref: true,
-	notifPref: false,
+	notifPref: true, /* true for disable all notifications */
 	urlStorageRestore: [],
 	urlStorage: [],
 	tabThis: true

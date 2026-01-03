@@ -44,6 +44,8 @@ let notifPref;
 let downloadDirectPref;
 let autoDownloadPref;
 let newline;
+let noCookies;
+let webTitlesBrandingRM;
 
 const customSupported = { ext: [], ct: [], type: "CUSTOM", category: "custom" };
 const isChrome = chrome.runtime.getURL("").startsWith("chrome-extension://");
@@ -67,8 +69,10 @@ const updateVars = async () => {
 	disablePref = await getStorage("disablePref");
 	notifDetectPref = await getStorage("notifDetectPref");
 	notifPref = await getStorage("notifPref");
+	noCookies = await getStorage("noCookies");
 	downloadDirectPref = await getStorage("downloadDirectPref");
 	autoDownloadPref = await getStorage("autoDownloadPref");
+	webTitlesBrandingRM = await getStorage("webTitlesBrandingRM");
 };
 
 const updateIcons = () => {
@@ -233,6 +237,133 @@ const urlFilter = (requestDetails) => {
 	addURL(requestDetails);
 };
 
+const getResolution = async (url, type) => {
+	if (!["HLS", "DASH"].includes(type)) return null;
+
+	try {
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => controller.abort(), 3000);
+		const response = await fetch(url, { signal: controller.signal });
+		clearTimeout(timeoutId);
+
+		if (!response.ok) return null;
+		const text = await response.text();
+
+		let resolutions = [];
+
+		// 1. Standard HLS Master Playlist Check
+		if (type === "HLS") {
+			const regex = /RESOLUTION=(\d+)x(\d+)/g;
+			let match;
+			while ((match = regex.exec(text)) !== null) {
+				resolutions.push({ w: parseInt(match[1]), h: parseInt(match[2]) });
+			}
+		}
+		// 2. DASH Representation Check
+		else if (type === "DASH") {
+			const regex = /<Representation([^>]+)>/g;
+			let match;
+			while ((match = regex.exec(text)) !== null) {
+				const attrs = match[1];
+				const wMatch = attrs.match(/width="(\d+)"/);
+				const hMatch = attrs.match(/height="(\d+)"/);
+				if (hMatch) {
+					resolutions.push({
+						w: wMatch ? parseInt(wMatch[1]) : 0,
+						h: parseInt(hMatch[1])
+					});
+				}
+			}
+		}
+
+		// 3. Media Playlist Fallback (For links like the one you provided)
+		if (resolutions.length === 0 && type === "HLS") {
+			// Map common URL keywords to resolutions
+			const keywordMap = {
+				_fhd: { w: 1920, h: 1080 },
+				_hd: { w: 1280, h: 720 },
+				_hq: { w: 848, h: 480 },
+				_sd: { w: 640, h: 360 },
+				_ld: { w: 320, h: 240 }
+			};
+
+			for (const [key, res] of Object.entries(keywordMap)) {
+				if (url.toLowerCase().includes(key)) {
+					resolutions.push(res);
+					break;
+				}
+			}
+		}
+
+		if (resolutions.length === 0) return null;
+
+		// Sorting logic
+		resolutions.sort((a, b) => b.w * b.h - a.w * a.h);
+
+		const maxRes = resolutions[0];
+		const { w, h } = maxRes;
+		const standards = [144, 240, 360, 480, 540, 720, 1080, 1440, 2160, 4320];
+
+		if (standards.includes(h) || w === 0) return `${h}p`;
+		return `${w}x${h}`;
+	} catch (e) {
+		return null;
+	}
+};
+
+// const getResolution = async (url, type) => {
+// 	if (!["HLS", "DASH"].includes(type)) return null;
+
+// 	try {
+// 		const controller = new AbortController();
+// 		const timeoutId = setTimeout(() => controller.abort(), 2000);
+// 		const response = await fetch(url, { signal: controller.signal });
+// 		clearTimeout(timeoutId);
+// 		if (!response.ok) return null;
+// 		const text = await response.text();
+
+// 		let resolutions = [];
+
+// 		if (type === "HLS") {
+// 			const regex = /RESOLUTION=(\d+)x(\d+)/g;
+// 			let match;
+// 			while ((match = regex.exec(text)) !== null) {
+// 				resolutions.push({ w: parseInt(match[1]), h: parseInt(match[2]) });
+// 			}
+// 		} else if (type === "DASH") {
+// 			const regex = /<Representation([^>]+)>/g;
+// 			let match;
+// 			while ((match = regex.exec(text)) !== null) {
+// 				const attrs = match[1];
+// 				const wMatch = attrs.match(/width="(\d+)"/);
+// 				const hMatch = attrs.match(/height="(\d+)"/);
+// 				if (hMatch) {
+// 					resolutions.push({
+// 						w: wMatch ? parseInt(wMatch[1]) : 0,
+// 						h: parseInt(hMatch[1])
+// 					});
+// 				}
+// 			}
+// 		}
+
+// 		if (resolutions.length === 0) return null;
+
+// 		resolutions.sort((a, b) => b.w * b.h - a.w * a.h);
+// 		if (resolutions[0].w === 0) resolutions.sort((a, b) => b.h - a.h);
+
+// 		const maxRes = resolutions[0];
+// 		const { w, h } = maxRes;
+
+// 		const standards = [144, 240, 360, 480, 540, 720, 1080, 1440, 2160, 4320];
+// 		if (standards.includes(h)) return `${h}p`;
+// 		if (w === 0) return `${h}p`;
+
+// 		return `${w}x${h}`;
+// 	} catch (e) {
+// 		return null;
+// 	}
+// };
+
 const addURL = async (requestDetails) => {
 	const url = new URL(requestDetails.url);
 
@@ -271,6 +402,7 @@ const addURL = async (requestDetails) => {
 				h.name.toLowerCase() === "content-length"
 		),
 		filename,
+		resolution: await getResolution(requestDetails.url, requestDetails.type),
 		hostname,
 		tabData: {
 			title: tabData?.title,

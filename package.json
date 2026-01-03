@@ -1,11 +1,11 @@
 {
 	"name": "stream-detector",
 	"author": {
-		"name": "54ac",
-		"email": "me@54ac.bio",
-		"url": "https://github.com/54ac"
+		"name": "spyderbibek",
+		"email": "",
+		"url": "https://github.com/spyderbibek"
 	},
-	"repository": "github:54ac/stream-detector",
+	"repository": "github:spyderbibek/stream-detector",
 	"version": "1.0.0",
 	"type": "module",
 	"private": true,

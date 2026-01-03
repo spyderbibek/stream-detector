@@ -92,9 +92,11 @@ const copyURL = async (info) => {
 					? e.tabData.title
 					: e.hostname
 			} | ${getTimestamp(e.timeStamp)}`;
-		else if (fileMethod === "kodiUrl") code = streamURL;
+		/* wtf is this mess, yandare dev? */ else if (fileMethod === "kodiUrl")
+			code = streamURL;
 		else if (fileMethod === "ffmpeg") code = "ffmpeg";
 		else if (fileMethod === "streamlink") code = "streamlink";
+		else if (fileMethod === "mpv") code = "mpv";
 		else if (fileMethod === "ytdlp") {
 			code = "yt-dlp --no-part --restrict-filenames";
 
@@ -201,8 +203,11 @@ const copyURL = async (info) => {
 				else if (fileMethod.startsWith("user"))
 					code = code.replace(new RegExp("%cookie%", "g"), headerCookie);
 			} else if (fileMethod === "ytdlp") {
-				if (!isChrome) code += ` --cookies-from-browser firefox`;
-				else code += ` --cookies-from-browser chrome`;
+				if ((await getStorage("noCookies")) === false) {
+					/* nocookies true won't add this junk */
+					if (!isChrome) code += ` --cookies-from-browser firefox`;
+					else code += ` --cookies-from-browser chrome`;
+				}
 			} else if (fileMethod.startsWith("user"))
 				code = code.replace(new RegExp("%cookie%", "g"), "");
 
@@ -219,6 +224,7 @@ const copyURL = async (info) => {
 					code += ` --referer "${headerReferer}"`;
 				else if (fileMethod === "hlsdl")
 					code += ` -h "Referer:${headerReferer}"`;
+				else if (fileMethod === "mpv") code += ` --referrer="${headerReferer}"`;
 				else if (fileMethod === "nm3u8dl")
 					code += ` --header "Referer: ${headerReferer}"`;
 				else if (fileMethod.startsWith("user"))
@@ -266,11 +272,23 @@ const copyURL = async (info) => {
 			"_"
 		);
 
-		// final part of command
+		/* Branding " - Website" removal txt list */
+		// Iterate through each web title and remove it from outFilename
+		let webTitlesBrandingRM = await getStorage("webTitlesBrandingRM");
+		webTitlesBrandingRM.forEach((title) => {
+			outFilename = outFilename.replace(title, "");
+		});
+
+		// Trim any leading or trailing whitespaces after removing web titles
+		outFilename = outFilename.trim();
+
+		// final part of command (LINK TO VIDEO)
 		if (fileMethod === "ffmpeg") {
 			code += ` -i "${streamURL}" -c copy "${outFilename}`;
 			if (timestampPref) code += ` ${outTimestamp}`;
 			code += `.${outExtension}"`;
+		} else if (fileMethod === "mpv") {
+			code += ` "${streamURL}"`;
 		} else if (fileMethod === "streamlink") {
 			if ((await getStorage("streamlinkOutput")) === "file") {
 				code += ` -o "${outFilename}`;
@@ -452,6 +470,10 @@ const createList = async () => {
 				} else sizeCell.textContent = "-";
 				row.appendChild(sizeCell);
 
+				const resCell = document.createElement("td");
+				resCell.textContent = requestDetails.resolution || "-";
+				row.appendChild(resCell);
+
 				const sourceCell = document.createElement("td");
 				sourceCell.textContent =
 					titlePref &&
@@ -623,6 +645,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 	for (const selectOption of selectOptions) {
 		if (!selectOption.textContent)
 			selectOption.textContent = _(selectOption.value);
+	}
+	const buttons = document.querySelectorAll("button[id]");
+	for (const button of buttons) {
+		button.textContent = _(button.id);
 	}
 
 	// button and text input functionality

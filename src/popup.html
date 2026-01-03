@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
@@ -42,6 +42,7 @@
 								<option value="tableForm"></option>
 								<option value="ytdlp"></option>
 								<option value="ffmpeg"></option>
+								<option value="mpv"></option>
 								<option value="streamlink"></option>
 								<option value="hlsdl"></option>
 								<option value="nm3u8dl"></option>
@@ -57,9 +58,10 @@
 				<table>
 					<colgroup>
 						<col style="width: 9%" />
-						<col style="width: 29%" />
-						<col style="width: 12%" />
 						<col style="width: 25%" />
+						<col style="width: 10%" />
+						<col style="width: 10%" />
+						<col style="width: 21%" />
 						<col style="width: 20%" />
 						<col style="width: 5%" />
 					</colgroup>
@@ -68,6 +70,7 @@
 							<th><label for="popupType" /></th>
 							<th><label for="popupFilename" /></th>
 							<th><label for="popupSize" /></th>
+							<th><label for="popupResolution" /></th>
 							<th><label for="popupSource" /></th>
 							<th><label for="popupTimestamp" /></th>
 							<th>✖</th>
@@ -84,19 +87,13 @@
 							<label for="disablePref" />
 						</td>
 						<td>
-							<button id="copyAll">
-								<label for="copyAll" />
-							</button>
+							<button id="copyAll"></button>
 						</td>
 						<td>
-							<button id="clearList">
-								<label for="clearList" />
-							</button>
+							<button id="clearList"></button>
 						</td>
 						<td>
-							<button id="openOptions">
-								<label for="openOptions" />
-							</button>
+							<button id="openOptions"></button>
 						</td>
 					</tr>
 				</tbody>

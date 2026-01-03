@@ -1,6 +1,6 @@
 {
-	"name": "The Stream Detector",
-	"version": "2.11.7",
+	"name": "Stream Detector",
+	"version": "2.12.0",
 	"description": "__MSG_extText__",
 	"manifest_version": 3,
 	"default_locale": "en",
@@ -34,7 +34,7 @@
 		"page": "options.html"
 	},
 	"action": {
-		"default_title": "The Stream Detector",
+		"default_title": "Stream Detector",
 		"default_popup": "popup.html",
 		"default_icon": {
 			"16": "img/icon-dark-16.png",

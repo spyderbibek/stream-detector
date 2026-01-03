@@ -7,12 +7,47 @@
 		<link rel="icon" href="favicon.ico" />
 	</head>
 	<body>
+		<h1>The Stream Detector - Options</h1>
 		<table>
 			<tbody>
+				<tr>
+					<td><label for="filenamePref" /></td>
+					<td>
+						<input class="option" id="filenamePref" type="checkbox" />
+					</td>
+				</tr>
+				<tr>
+					<td><label for="noCookies" /></td>
+					<td>
+						<input class="option" id="noCookies" type="checkbox" />
+					</td>
+				</tr>
 				<tr>
 					<td><label for="disablePref" /></td>
 					<td>
 						<input class="option" id="disablePref" type="checkbox" />
+					</td>
+				</tr>
+				<tr>
+					<td><label for="notifDetectPref" /></td>
+					<td>
+						<input class="option" id="notifDetectPref" type="checkbox" />
+					</td>
+				</tr>
+				<tr>
+					<td><label for="notifPref" /></td>
+					<td>
+						<input class="option" id="notifPref" type="checkbox" />
+					</td>
+				</tr>
+				<tr>
+					<td><label for="webTitlesBrandingRM" /></td>
+					<td>
+						<textarea
+							class="option"
+							id="webTitlesBrandingRM"
+							placeholder=" - Website&#10; - Videos&#10; - Something"
+						></textarea>
 					</td>
 				</tr>
 				<tr>
@@ -75,6 +110,7 @@
 							<option value="tableForm"></option>
 							<option value="ytdlp"></option>
 							<option value="ffmpeg"></option>
+							<option value="mpv"></option>
 							<option value="streamlink"></option>
 							<option value="hlsdl"></option>
 							<option value="nm3u8dl"></option>
@@ -166,7 +202,6 @@
 				<tr>
 					<td><label for="customExtPref" /></td>
 					<td>
-						<input class="option" id="customExtPref" type="checkbox" />
 						<textarea
 							class="option"
 							id="customExtEntries"
@@ -201,12 +236,6 @@
 					<td><label for="titlePref" /></td>
 					<td>
 						<input class="option" id="titlePref" type="checkbox" />
-					</td>
-				</tr>
-				<tr>
-					<td><label for="filenamePref" /></td>
-					<td>
-						<input class="option" id="filenamePref" type="checkbox" />
 					</td>
 				</tr>
 				<tr>
@@ -310,18 +339,6 @@
 								value="5"
 							/>
 						</div>
-					</td>
-				</tr>
-				<tr>
-					<td><label for="notifDetectPref" /></td>
-					<td>
-						<input class="option" id="notifDetectPref" type="checkbox" />
-					</td>
-				</tr>
-				<tr>
-					<td><label for="notifPref" /></td>
-					<td>
-						<input class="option" id="notifPref" type="checkbox" />
 					</td>
 				</tr>
 				<tr>
